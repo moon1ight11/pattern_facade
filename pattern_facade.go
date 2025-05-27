@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 // Подсистема 1: Ходовые огни
@@ -54,6 +55,23 @@ func (c *conditioner) set_temp_conditioner(temp int) {
 	fmt.Printf("Кондиционер: установлена температура %d°C\n", temp)
 }
 
+// Подсистема 6: Режим кпп
+type transmission_mode struct {}
+
+func (tm *transmission_mode) set_trans_mode(transmission_mode string) {
+	fmt.Printf("Трансмиссия установлена в режим %s\n", transmission_mode)
+}
+
+// Подсистема 7: Охрана
+type sequrity struct {}
+
+func (sq *sequrity) Off() {
+	fmt.Println("Сигнализация деактивирована")
+}
+func (sq *sequrity) On() {
+	fmt.Println("Сигнализация активирована")
+}
+
 // Фасад: умный авто
 type SmartAuto struct {
 	lights *lights
@@ -61,6 +79,8 @@ type SmartAuto struct {
 	selector *selector
 	speed_limiter *speed_limiter
 	conditioner *conditioner
+	transmission_mode *transmission_mode
+	sequrity *sequrity
 }
 
 // Конструктор фасада
@@ -71,23 +91,34 @@ func new_SmartAuto() *SmartAuto {
 		selector: &selector{},
 		speed_limiter: &speed_limiter{},
 		conditioner: &conditioner{},
+		transmission_mode: &transmission_mode{},
+		sequrity: &sequrity{},
 	}
 }
 
 // Метод для включения режима "Стоянка"
 func (s *SmartAuto) ParkingMode() {
 	fmt.Println("Активация режима 'Стоянка'")
+	time.Sleep(2 * time.Second)
 	s.lights.Off()
+	time.Sleep(1 * time.Second)
 	s.hand_brake.On()
+	time.Sleep(1 * time.Second)
 	s.selector.Parking()
+	time.Sleep(1 * time.Second)
 	s.speed_limiter.Off()
+	time.Sleep(1 * time.Second)
 	s.conditioner.Off()
+	time.Sleep(1 * time.Second)
+	s.sequrity.On()
+	time.Sleep(2 * time.Second)
 	fmt.Println("Режим 'Стоянка' успешно активирован")
 }
 
 // Метод для включения режима "Поездка"
 func (s *SmartAuto) DriveMode() {
 	fmt.Println("Активация режима 'Поездка'")
+	time.Sleep(2 * time.Second)
 
 	var limit int
 	fmt.Println("Установите ограничение скорости")
@@ -97,11 +128,26 @@ func (s *SmartAuto) DriveMode() {
 	fmt.Println("Установите температуру воздуха в салоне")
 	fmt.Scan(&temp)
 
+	var transmission_mode string
+	fmt.Println("Выберите режим работы КПП (Sport/Manu/Dirt/Eco)")
+	fmt.Scan(&transmission_mode)
+	time.Sleep(2 * time.Second)
+
+	s.sequrity.Off()
+	time.Sleep(1 * time.Second)
 	s.lights.On()
+	time.Sleep(1 * time.Second)
 	s.hand_brake.Off()
+	time.Sleep(1 * time.Second)
 	s.selector.Drive()
+	time.Sleep(1 * time.Second)
+	s.transmission_mode.set_trans_mode(transmission_mode)
+	time.Sleep(1 * time.Second)
 	s.speed_limiter.set_speed_limit(limit)
+	time.Sleep(1 * time.Second)
 	s.conditioner.set_temp_conditioner(temp)
+	time.Sleep(2 * time.Second)
+	
 
 	fmt.Println("Режим 'Поездка' успешно активирован")
 }
