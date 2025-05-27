@@ -123,14 +123,26 @@ func (s *SmartAuto) DriveMode() {
 	var limit int
 	fmt.Println("Установите ограничение скорости")
 	fmt.Scan(&limit)
+	if limit > 180 {
+		fmt.Println("Ошибка. Указанное значение установить невозможно")
+		return
+	}
 	
 	var temp int
 	fmt.Println("Установите температуру воздуха в салоне")
 	fmt.Scan(&temp)
+	if temp < 10 && temp > 35 {
+		fmt.Println("Ошибка. Температура вне диапазона работы кондиционера")
+		return
+	}
 
 	var transmission_mode string
-	fmt.Println("Выберите режим работы КПП (Sport/Manu/Dirt/Eco)")
+	fmt.Println("Выберите режим работы КПП (Sport/Dirt/Eco)")
 	fmt.Scan(&transmission_mode)
+	if transmission_mode != "Sport" && transmission_mode != "Dirt" && transmission_mode != "Eco" {
+		fmt.Println("Ошибка. Некорректно указан режим")
+		return
+	}
 	time.Sleep(2 * time.Second)
 
 	s.sequrity.Off()
@@ -158,6 +170,10 @@ func main() {
 	var Mode string
 	fmt.Println("Какой режим нужно активировать?(Drive/Parking)")
 	fmt.Scan(&Mode)
+	if Mode != "Drive" && Mode != "Parking" {
+		fmt.Println("Некорректно указан режим")
+		return
+	}
 
 	if Mode == "Drive" {
 		smartCar.DriveMode()
