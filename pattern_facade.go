@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"time"
+	"math/rand"
 )
+
 
 // Подсистема 1: Ходовые огни
 type lights struct{}
@@ -15,6 +17,7 @@ func (l *lights) On() {
 	fmt.Println("Ходовые огни включены")
 }
 
+
 // Подсистема 2: Стояночный тормоз
 type hand_brake struct {}
 
@@ -24,6 +27,7 @@ func (h *hand_brake) Off() {
 func (h *hand_brake) On() {
 	fmt.Println("Стояночный тормоз установлен")
 }
+
 
 // Подсистема 3: Положение селектора кпп
 type selector struct {} 
@@ -35,6 +39,7 @@ func (s *selector) Parking() {
 	fmt.Println("Селектор КПП в положении PARKING")
 }
 
+
 // Подсистема 4: Ограничение скорости
 type speed_limiter struct {}
 
@@ -44,6 +49,7 @@ func (sl *speed_limiter) Off() {
 func (sl *speed_limiter) set_speed_limit(limit int) {
 	fmt.Printf("Ограничитель скорости: установлено ограничение в %d км/ч\n", limit)
 }
+
 
 // Подсистема 5: Кондиционер
 type conditioner struct {}
@@ -55,12 +61,14 @@ func (c *conditioner) set_temp_conditioner(temp int) {
 	fmt.Printf("Кондиционер: установлена температура %d°C\n", temp)
 }
 
+
 // Подсистема 6: Режим кпп
 type transmission_mode struct {}
 
 func (tm *transmission_mode) set_trans_mode(transmission_mode string) {
 	fmt.Printf("Трансмиссия установлена в режим %s\n", transmission_mode)
 }
+
 
 // Подсистема 7: Охрана
 type sequrity struct {}
@@ -71,6 +79,14 @@ func (sq *sequrity) Off() {
 func (sq *sequrity) On() {
 	fmt.Println("Сигнализация активирована")
 }
+func (sq *sequrity) Heating() {
+	heat_time := rand.Intn(15)
+
+	fmt.Println("Попытка запуска ДВС...")
+	time.Sleep(4 * time.Second)
+	fmt.Printf("Двигатель запущен, до полного прогрева примерно %d минут \n", heat_time)
+}
+
 
 // Фасад: умный авто
 type SmartAuto struct {
@@ -82,6 +98,7 @@ type SmartAuto struct {
 	transmission_mode *transmission_mode
 	sequrity *sequrity
 }
+
 
 // Конструктор фасада
 func new_SmartAuto() *SmartAuto {
@@ -95,6 +112,7 @@ func new_SmartAuto() *SmartAuto {
 		sequrity: &sequrity{},
 	}
 }
+
 
 // Метод для включения режима "Стоянка"
 func (s *SmartAuto) ParkingMode() {
@@ -114,6 +132,7 @@ func (s *SmartAuto) ParkingMode() {
 	time.Sleep(2 * time.Second)
 	fmt.Println("Режим 'Стоянка' успешно активирован")
 }
+
 
 // Метод для включения режима "Поездка"
 func (s *SmartAuto) DriveMode() {
@@ -164,20 +183,41 @@ func (s *SmartAuto) DriveMode() {
 	fmt.Println("Режим 'Поездка' успешно активирован")
 }
 
+
+// метод для режима Прогрев
+func (s *SmartAuto) HeatingMode() {
+	fmt.Println("Активация режима 'Прогрев'")
+	time.Sleep(2 * time.Second)
+
+	s.lights.On()
+	time.Sleep(1 * time.Second)
+	s.hand_brake.On()
+	time.Sleep(1 * time.Second)
+	s.selector.Parking()
+	time.Sleep(1 * time.Second)
+	s.sequrity.Heating()
+	time.Sleep(2 * time.Second)
+
+	fmt.Println("Режим 'Прогрев' успешно активирован")
+}
+
+
+
 func main() {
 	smartCar := new_SmartAuto()
 
 	var Mode string
-	fmt.Println("Какой режим нужно активировать?(Drive/Parking)")
+	fmt.Println("Какой режим нужно активировать?(Drive/Parking/Heating)")
 	fmt.Scan(&Mode)
-	if Mode != "Drive" && Mode != "Parking" {
-		fmt.Println("Некорректно указан режим")
-		return
-	}
 
 	if Mode == "Drive" {
 		smartCar.DriveMode()
 	} else if Mode == "Parking" {
 		smartCar.ParkingMode()
+	} else if Mode == "Heating" {
+		smartCar.HeatingMode()
+	} else {
+		fmt.Println("Некорректно указан режим")
+		return
 	}
 }
